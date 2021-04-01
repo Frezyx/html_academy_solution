@@ -139,3 +139,4 @@ cython_debug/
 
 firefox_breaker.py
 broken.text
+.DC_Store

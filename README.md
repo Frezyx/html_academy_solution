@@ -17,7 +17,7 @@ pip3 install -U webdriver-manager selenium
 * Запустите решателя: 
 
 ```python
-python solver.py
+python3 solver.py
 ```
 
 **Бот не умеет решать задачи, где требуется действие студиента**
