@@ -25,8 +25,7 @@ def init_driver():
             return driver
         except Exception:
             continue
-    else:
-        raise Exception("Поддерживаемый браузер не найден")
+    raise Exception("Поддерживаемый браузер не найден")
 
 
 def set_text(input_form_id, value):
@@ -47,12 +46,13 @@ def sign_in():
     submit.click()
 
 
-def get_tasks_count():
+def get_tasks_count(trainer_url):
     global driver
 
+    driver.get(trainer_url)
+
     count_elem = driver.find_element_by_css_selector(".course-nav__stat")
-    count_text = count_elem.text
-    parts = count_text.split('/')
+    parts = count_elem.text.split('/')
     return int(parts[1])
 
 
@@ -80,10 +80,10 @@ def solve_trainer_tasks(count, trainer_url):
     global driver
 
     for i in range(1, count + 1):
-        now_url = f"{trainer_url}/{i}"
-        print(now_url)
+        task_url = f"{trainer_url}/{i}"
+        print(task_url)
         try:
-            solve_task(now_url)
+            solve_task(task_url)
         except TimeoutException:
             print("Время ожидания элемента вышло")
         except Exception as e:
@@ -123,7 +123,7 @@ def solve():
 
     print("Давай короче я погнал")
 
-    trainer_link = "https://htmlacademy.ru/continue/course"
+    trainer_template = "https://htmlacademy.ru/continue/course"
 
     links_id = [
         39, 42, 44, 45, 46, 50, 51, 53, 55, 57, 58, 65, 66, 70, 71, 73, 74, 76, 79, 80, 84, 85, 86, 88, 96, 97, 98,
@@ -133,11 +133,15 @@ def solve():
     ]
 
     for link_id in links_id:
-        driver.get(f'{trainer_link}/{link_id}')
-        count_tasks = get_tasks_count()
+        trainer_url = f'{trainer_template}/{link_id}'
+        try:
+            count_tasks = get_tasks_count(trainer_url)
+        except Exception:
+            print(f"Невозможно найти кол-во заданий ({trainer_url})")
+            continue
 
-        url = driver.current_url
-        trainer_url = url[:url.rfind('/')]
+        trainer_url = driver.current_url
+        trainer_url = trainer_url[:trainer_url.rfind('/')]
 
         solve_trainer_tasks(count_tasks, trainer_url)
 
@@ -152,7 +156,7 @@ if __name__ == "__main__":
         password = getpass("Введите пароль HTML Academy: ")
 
     # driver = webdriver.Chrome(ChromeDriverManager().install())
-    driver = webdriver.Firefox()
+    driver = init_driver()
     driver.get("https://htmlacademy.ru/login")
 
     solve()
