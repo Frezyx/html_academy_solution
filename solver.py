@@ -1,12 +1,13 @@
 import time
 import getpass
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
 
 login = input("Введите логин HTML Academy: ")
 password = getpass.getpass("Введите пароль HTML Academy: ")
 
-driver = webdriver.Chrome(ChromeDriverManager().install())
+# driver = webdriver.Chrome(ChromeDriverManager().install())
+driver = webdriver.Firefox()
 driver.get("https://htmlacademy.ru/login")
 
 
@@ -42,9 +43,8 @@ def solve_task():
             if show_answer.text == 'Показать ответ':
                 break
             time.sleep(1)
-    except:
-        print('Произошла ошибка при решении')
-        pass
+    except Exception as e:
+        print(f'Произошла ошибка при решении: {e}')
 
 
 def run_solve(count, trainer_url):
