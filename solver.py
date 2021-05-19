@@ -11,6 +11,10 @@ from seleniumwire.webdriver import ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 
+# global
+unsolved_tasks_urls = []
+
+
 def init_driver():
     try:
         options = FirefoxOptions()
@@ -74,7 +78,7 @@ def solve_task(driver, task_url):
     waiter40.until(EC.text_to_be_present_in_element(locator, "Показать ответ"))
 
 
-def solve_trainer_tasks(driver, count, trainer_url):
+def solve_tasks(driver, count, trainer_url):
     for i in range(1, count + 1):
         task_url = f"{trainer_url}/{i}"
         print(task_url)
@@ -82,8 +86,10 @@ def solve_trainer_tasks(driver, count, trainer_url):
             solve_task(driver, task_url)
         except TimeoutException:
             print("Время ожидания элемента вышло")
+            unsolved_tasks_urls.append(task_url)
         except Exception as e:
             print(f"Произошла ошибка при решении: {e}")
+            unsolved_tasks_urls.append(task_url)
 
 
 def get_trainer_links_id(driver):
@@ -125,7 +131,7 @@ def solve(driver, links_id):
         trainer_url = driver.current_url
         trainer_url = trainer_url[:trainer_url.rfind('/')]
 
-        solve_trainer_tasks(driver, count_tasks, trainer_url)
+        solve_tasks(driver, count_tasks, trainer_url)
 
 
 def main():
@@ -137,11 +143,6 @@ def main():
     if password is None:
         password = getpass("Введите пароль HTML Academy: ")
 
-    driver = init_driver()
-
-    print("Логинюсь")
-    sign_in(driver, login, password)
-
     links_id = [
         39, 42, 44, 45, 46, 50, 51, 53, 55, 57, 58, 65, 66, 70, 71, 73, 74, 76, 79, 80, 84, 85, 86, 88, 96, 97, 98,
         102, 103, 104, 113, 125, 128, 129, 130, 156, 157, 158, 165, 187, 195, 197, 199, 207, 209, 211, 213, 215, 217,
@@ -149,7 +150,11 @@ def main():
         359, 365, 367
     ]
 
-    solve(driver, links_id)
+    with init_driver() as driver:
+        print("Логинюсь")
+        sign_in(driver, login, password)
+
+        solve(driver, links_id)
 
 
 if __name__ == "__main__":
