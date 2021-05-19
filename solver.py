@@ -6,6 +6,23 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 import os
 
+def slice_list(input, size):
+    input_size = len(input)
+    slice_size = input_size / size
+    remain = input_size % size
+    result = []
+    iterator = iter(input)
+    for i in range(size):
+        result.append([])
+        for j in range(slice_size):
+            result[i].append(iterator.next())
+        if remain:
+            result[i].append(iterator.next())
+            remain -= 1
+    return result
+
+
+
 bad_urls = []
 
 urls = ['https://htmlacademy.ru/continue/course/79', 'https://htmlacademy.ru/continue/course/128',
@@ -45,9 +62,8 @@ urls = ['https://htmlacademy.ru/continue/course/79', 'https://htmlacademy.ru/con
         'https://htmlacademy.ru/continue/course/347', 'https://htmlacademy.ru/continue/course/58',
         'https://htmlacademy.ru/continue/course/307', 'https://htmlacademy.ru/continue/course/309',
         'https://htmlacademy.ru/continue/course/213', 'https://htmlacademy.ru/continue/course/65']
-proc_count = os.cpu_count()
-splitted = [urls[i:i + proc_count] for i in range(0, len(urls), proc_count)]
 
+proc_count = os.cpu_count()
 login = input("Введите логин HTML Academy: ")
 password = getpass.getpass("Введите пароль HTML Academy: ")
 print("Введите количество ядер для работы (максимальное кол-во ядер вашей системы - " + str(proc_count) + "):")
@@ -56,6 +72,8 @@ if t_count > proc_count:
     t_count = proc_count
 if t_count < 1:
     t_count = 1
+
+splitted = slice_list(t_count)
 
 
 def set_text(input_form_id, value, driver):
@@ -133,6 +151,7 @@ def solve():
         x.start()
     for x in threads:
         x.join()
+    print(len(bad_urls))
     print(bad_urls)
 
 
