@@ -16,6 +16,7 @@ def set_text(input_form_id, value):
     global driver
 
     email_elem = driver.find_element_by_id(input_form_id)
+    email_elem.click()
     email_elem.clear()
     email_elem.send_keys(value)
 
@@ -26,14 +27,16 @@ def sign_in():
     print('Логинюсь')
     set_text("login-email", login)
     set_text("login-password", password)
-    driver.find_element_by_xpath('/html/body/div[1]/div/div/div/div/form/input[3]').click()
+    submit = driver.find_element_by_css_selector(".button--full-width[type='submit']")
+    submit.click()
 
 
 def get_tasks_count():
     global driver
 
-    count = driver.find_element_by_xpath("/html/body/header/div/div/nav/div/div/span").text
-    parts = count.split('/')
+    count_elem = driver.find_element_by_css_selector(".course-nav__stat")
+    count_text = count_elem.text
+    parts = count_text.split('/')
     return int(parts[1])
 
 
@@ -41,12 +44,12 @@ def solve_task():
     global driver
 
     try:
-        driver.find_element_by_xpath("/html/body/main/div[1]/article/div[2]/div/button").click()
-        show_answer = driver.find_element_by_css_selector(
-            "body > main > div.course-container__inner > article > "
-            "div.course-layout__column.course-layout__column--left > div.course-editor-controls > "
-            "button.course-editor-controls__item.course-editor-controls__item--answer")
-        show_answer.click()
+        close_button = driver.find_element_by_css_selector(".course-theory__close.icon-close")
+        close_button.click()
+
+        show_answer = driver.find_element_by_css_selector(".course-editor-controls__item--answer")
+        # warning: костыль для нажатия кнопки в случаях, когда этому мешает отображение других элементов
+        driver.execute_script("arguments[0].click();", show_answer)
 
         while True:
             if show_answer.text == 'Показать ответ':
@@ -60,8 +63,7 @@ def run_solve(count, trainer_url):
     global driver
 
     for i in range(1, count + 1):
-        current_position = i
-        now_url = f"{trainer_url}/{current_position}"
+        now_url = f"{trainer_url}/{i}"
         print(now_url)
         driver.get(now_url)
         solve_task()
@@ -118,8 +120,9 @@ def solve():
         driver.get(url)
 
         url = driver.current_url
-        trainer_url = url[:url.rfind('/')]
         count_tasks = get_tasks_count()
+
+        trainer_url = url[:url.rfind('/')]
         run_solve(count_tasks, trainer_url)
 
 
