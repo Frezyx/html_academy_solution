@@ -6,21 +6,13 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 import os
 
-def slice_list(input, size):
-    input_size = len(input)
-    slice_size = input_size / size
-    remain = input_size % size
-    result = []
-    iterator = iter(input)
-    for i in range(size):
-        result.append([])
-        for j in range(slice_size):
-            result[i].append(iterator.next())
-        if remain:
-            result[i].append(iterator.next())
-            remain -= 1
-    return result
 
+def divide(lst, n):
+    p = len(lst) // n
+    if len(lst) - p > 0:
+        return [lst[:p]] + divide(lst[p:], n - 1)
+    else:
+        return [lst]
 
 
 bad_urls = []
@@ -62,7 +54,6 @@ urls = ['https://htmlacademy.ru/continue/course/79', 'https://htmlacademy.ru/con
         'https://htmlacademy.ru/continue/course/347', 'https://htmlacademy.ru/continue/course/58',
         'https://htmlacademy.ru/continue/course/307', 'https://htmlacademy.ru/continue/course/309',
         'https://htmlacademy.ru/continue/course/213', 'https://htmlacademy.ru/continue/course/65']
-
 proc_count = os.cpu_count()
 login = input("Введите логин HTML Academy: ")
 password = getpass.getpass("Введите пароль HTML Academy: ")
@@ -73,7 +64,7 @@ if t_count > proc_count:
 if t_count < 1:
     t_count = 1
 
-splitted = slice_list(t_count)
+splitted = divide(urls, t_count)
 
 
 def set_text(input_form_id, value, driver):
@@ -125,6 +116,7 @@ def run_solve(count, trainer_url, driver):
         print(now_url)
         driver.get(now_url)
         solve_task(driver)
+
 
 def do_work_in_thread(cutted_urls):
     chrome_options = Options()
