@@ -1,8 +1,11 @@
-import time
 import getpass
-from selenium import webdriver
 
+import selenium.webdriver.support.expected_conditions as EC
+from selenium import webdriver
 # from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 login = input("Введите логин HTML Academy: ")
 password = getpass.getpass("Введите пароль HTML Academy: ")
@@ -43,20 +46,26 @@ def get_tasks_count():
 def solve_task():
     global driver
 
-    try:
-        close_button = driver.find_element_by_css_selector(".course-theory__close.icon-close")
-        close_button.click()
+    waiter15 = WebDriverWait(driver, 15)
+    waiter40 = WebDriverWait(driver, 40)
 
-        show_answer = driver.find_element_by_css_selector(".course-editor-controls__item--answer")
-        # warning: костыль для нажатия кнопки в случаях, когда этому мешает отображение других элементов
+    locator = ('UNDEFINED', 'UNDEFINED')
+
+    try:
+        locator = (By.CSS_SELECTOR, ".course-theory__close.icon-close")
+        close = waiter15.until(EC.visibility_of_element_located(locator))
+        close.click()
+
+        locator = (By.CSS_SELECTOR, ".course-editor-controls__item--answer")
+        show_answer = waiter15.until(EC.visibility_of_element_located(locator))
+        # warning: костыль против "element is not clickable because another element obscures it"
         driver.execute_script("arguments[0].click();", show_answer)
 
-        while True:
-            if show_answer.text == 'Показать ответ':
-                break
-            time.sleep(1)
+        waiter40.until(EC.text_to_be_present_in_element(locator, "Показать ответ"))
+    except TimeoutException:
+        print(f"Время ожидания элемента '{locator[1]}' вышло")
     except Exception as e:
-        print(f'Произошла ошибка при решении: {e}')
+        print(f"Произошла ошибка при решении: {e}")
 
 
 def run_solve(count, trainer_url):
