@@ -12,19 +12,24 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 
 def init_driver():
-    drivers_data = [
-        ("Chrome", webdriver.Chrome, ChromeOptions),
-        ("Firefox", webdriver.Firefox, FirefoxOptions),
-        # etc
-    ]
+    try:
+        options = FirefoxOptions()
+        options.headless = True
+        driver = webdriver.Firefox(options=options)
+        return driver
+    except Exception:
+        pass
 
-    for name, browser, options in drivers_data:
-        try:
-            options.headless = True
-            driver = browser(options=options)
-            return driver
-        except Exception:
-            continue
+    try:
+        options = ChromeOptions()
+        options.add_argument("--headless")
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        return driver
+    except Exception:
+        pass
+
+    # etc
+
     raise Exception("Поддерживаемый браузер не найден")
 
 
@@ -74,7 +79,7 @@ def solve_trainer_tasks(driver, count, trainer_url):
         task_url = f"{trainer_url}/{i}"
         print(task_url)
         try:
-            solve_task(task_url)
+            solve_task(driver, task_url)
         except TimeoutException:
             print("Время ожидания элемента вышло")
         except Exception as e:
@@ -104,17 +109,10 @@ def get_trainer_links_id(driver):
     return sorted(set(links_id))
 
 
-def solve(driver):
+def solve(driver, links_id):
     print("Давай короче я погнал")
 
     trainer_template = "https://htmlacademy.ru/continue/course"
-
-    links_id = [
-        39, 42, 44, 45, 46, 50, 51, 53, 55, 57, 58, 65, 66, 70, 71, 73, 74, 76, 79, 80, 84, 85, 86, 88, 96, 97, 98,
-        102, 103, 104, 113, 125, 128, 129, 130, 156, 157, 158, 165, 187, 195, 197, 199, 207, 209, 211, 213, 215, 217,
-        219, 259, 269, 273, 297, 299, 301, 303, 305, 307, 309, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357,
-        359, 365, 367
-    ]
 
     for link_id in links_id:
         trainer_url = f'{trainer_template}/{link_id}'
@@ -139,13 +137,19 @@ def main():
     if password is None:
         password = getpass("Введите пароль HTML Academy: ")
 
-    # driver = webdriver.Chrome(ChromeDriverManager().install())
     driver = init_driver()
 
     print("Логинюсь")
     sign_in(driver, login, password)
 
-    solve(driver)
+    links_id = [
+        39, 42, 44, 45, 46, 50, 51, 53, 55, 57, 58, 65, 66, 70, 71, 73, 74, 76, 79, 80, 84, 85, 86, 88, 96, 97, 98,
+        102, 103, 104, 113, 125, 128, 129, 130, 156, 157, 158, 165, 187, 195, 197, 199, 207, 209, 211, 213, 215, 217,
+        219, 259, 269, 273, 297, 299, 301, 303, 305, 307, 309, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357,
+        359, 365, 367
+    ]
+
+    solve(driver, links_id)
 
 
 if __name__ == "__main__":
