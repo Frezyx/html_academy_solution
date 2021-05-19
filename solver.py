@@ -107,4 +107,5 @@ def solve():
         run_solve(count_tasks, trainer_url)
 
 
-solve()
+if __name__ == '__main__':
+    solve()
