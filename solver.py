@@ -1,6 +1,7 @@
 import time
 import getpass
 from selenium import webdriver
+
 # from webdriver_manager.chrome import ChromeDriverManager
 
 login = input("Введите логин HTML Academy: ")
@@ -86,46 +87,22 @@ def get_trainer_links():
 def solve():
     sign_in()
     print('Давай короче я погнал')
-    for trainer_link in ['https://htmlacademy.ru/continue/course/79', 'https://htmlacademy.ru/continue/course/128',
-                         'https://htmlacademy.ru/continue/course/349', 'https://htmlacademy.ru/continue/course/84',
-                         'https://htmlacademy.ru/continue/course/217', 'https://htmlacademy.ru/continue/course/80',
-                         'https://htmlacademy.ru/continue/course/53', 'https://htmlacademy.ru/continue/course/343',
-                         'https://htmlacademy.ru/continue/course/157', 'https://htmlacademy.ru/continue/course/337',
-                         'https://htmlacademy.ru/continue/course/74', 'https://htmlacademy.ru/continue/course/299',
-                         'https://htmlacademy.ru/continue/course/351', 'https://htmlacademy.ru/continue/course/359',
-                         'https://htmlacademy.ru/continue/course/199', 'https://htmlacademy.ru/continue/course/73',
-                         'https://htmlacademy.ru/continue/course/85', 'https://htmlacademy.ru/continue/course/44',
-                         'https://htmlacademy.ru/continue/course/219', 'https://htmlacademy.ru/continue/course/303',
-                         'https://htmlacademy.ru/continue/course/113', 'https://htmlacademy.ru/continue/course/129',
-                         'https://htmlacademy.ru/continue/course/259', 'https://htmlacademy.ru/continue/course/269',
-                         'https://htmlacademy.ru/continue/course/66', 'https://htmlacademy.ru/continue/course/88',
-                         'https://htmlacademy.ru/continue/course/365', 'https://htmlacademy.ru/continue/course/71',
-                         'https://htmlacademy.ru/continue/course/125', 'https://htmlacademy.ru/continue/course/130',
-                         'https://htmlacademy.ru/continue/course/96', 'https://htmlacademy.ru/continue/course/98',
-                         'https://htmlacademy.ru/continue/course/51', 'https://htmlacademy.ru/continue/course/103',
-                         'https://htmlacademy.ru/continue/course/195', 'https://htmlacademy.ru/continue/course/50',
-                         'https://htmlacademy.ru/continue/course/211', 'https://htmlacademy.ru/continue/course/45',
-                         'https://htmlacademy.ru/continue/course/341', 'https://htmlacademy.ru/continue/course/305',
-                         'https://htmlacademy.ru/continue/course/357', 'https://htmlacademy.ru/continue/course/273',
-                         'https://htmlacademy.ru/continue/course/76', 'https://htmlacademy.ru/continue/course/156',
-                         'https://htmlacademy.ru/continue/course/209', 'https://htmlacademy.ru/continue/course/215',
-                         'https://htmlacademy.ru/continue/course/197', 'https://htmlacademy.ru/continue/course/86',
-                         'https://htmlacademy.ru/continue/course/353', 'https://htmlacademy.ru/continue/course/339',
-                         'https://htmlacademy.ru/continue/course/55', 'https://htmlacademy.ru/continue/course/42',
-                         'https://htmlacademy.ru/continue/course/97', 'https://htmlacademy.ru/continue/course/104',
-                         'https://htmlacademy.ru/continue/course/301', 'https://htmlacademy.ru/continue/course/355',
-                         'https://htmlacademy.ru/continue/course/39', 'https://htmlacademy.ru/continue/course/345',
-                         'https://htmlacademy.ru/continue/course/102', 'https://htmlacademy.ru/continue/course/367',
-                         'https://htmlacademy.ru/continue/course/46', 'https://htmlacademy.ru/continue/course/187',
-                         'https://htmlacademy.ru/continue/course/57', 'https://htmlacademy.ru/continue/course/207',
-                         'https://htmlacademy.ru/continue/course/70', 'https://htmlacademy.ru/continue/course/165',
-                         'https://htmlacademy.ru/continue/course/158', 'https://htmlacademy.ru/continue/course/297',
-                         'https://htmlacademy.ru/continue/course/347', 'https://htmlacademy.ru/continue/course/58',
-                         'https://htmlacademy.ru/continue/course/307', 'https://htmlacademy.ru/continue/course/309',
-                         'https://htmlacademy.ru/continue/course/213', 'https://htmlacademy.ru/continue/course/65']:
-        driver.get(trainer_link)
+
+    trainer_link = 'https://htmlacademy.ru/continue/course/'
+
+    links_id = [
+        39, 42, 44, 45, 46, 50, 51, 53, 55, 57, 58, 65, 66, 70, 71, 73, 74, 76, 79, 80, 84, 85, 86, 88, 96, 97, 98,
+        102, 103, 104, 113, 125, 128, 129, 130, 156, 157, 158, 165, 187, 195, 197, 199, 207, 209, 211, 213, 215, 217,
+        219, 259, 269, 273, 297, 299, 301, 303, 305, 307, 309, 337, 339, 341, 343, 345, 347, 349, 351, 353, 355, 357,
+        359, 365, 367
+    ]
+
+    for link_id in links_id:
+        url = f'{trainer_link}/{link_id}'
+        driver.get(url)
+
         url = driver.current_url
-        trainer_url = url[0:url.rfind('/')]
+        trainer_url = url[:url.rfind('/')]
         count_tasks = get_tasks_count()
         run_solve(count_tasks, trainer_url)
 
