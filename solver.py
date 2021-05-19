@@ -156,6 +156,8 @@ def main():
 
         solve(driver, links_id)
 
+    print("\nНерешённые задания:", *unsolved_tasks_urls, sep='\n')
+
 
 if __name__ == "__main__":
     main()
