@@ -1,4 +1,5 @@
 import getpass
+from os import environ
 
 import selenium.webdriver.support.expected_conditions as EC
 from selenium import webdriver
@@ -7,8 +8,13 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 
-login = input("Введите логин HTML Academy: ")
-password = getpass.getpass("Введите пароль HTML Academy: ")
+login = environ.get('LOGIN', None)
+password = environ.get('PASSWORD', None)
+
+if login is None:
+    login = input("Введите логин HTML Academy: ")
+if password is None:
+    password = getpass.getpass("Введите пароль HTML Academy: ")
 
 # driver = webdriver.Chrome(ChromeDriverManager().install())
 driver = webdriver.Firefox()
