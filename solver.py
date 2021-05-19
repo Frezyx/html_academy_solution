@@ -7,6 +7,26 @@ from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from seleniumwire.webdriver import ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+
+
+def init_driver():
+    drivers_data = [
+        ("Chrome", webdriver.Chrome, ChromeOptions),
+        ("Firefox", webdriver.Firefox, FirefoxOptions),
+        # etc
+    ]
+
+    for name, browser, options in drivers_data:
+        try:
+            options.headless = True
+            driver = browser(options=options)
+            return driver
+        except Exception:
+            continue
+    else:
+        raise Exception("Поддерживаемый браузер не найден")
 
 
 def set_text(input_form_id, value):
