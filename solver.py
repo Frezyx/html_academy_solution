@@ -13,12 +13,16 @@ driver.get("https://htmlacademy.ru/login")
 
 
 def set_text(input_form_id, value):
+    global driver
+
     email_elem = driver.find_element_by_id(input_form_id)
     email_elem.clear()
     email_elem.send_keys(value)
 
 
 def sign_in():
+    global driver
+
     print('Логинюсь')
     set_text("login-email", login)
     set_text("login-password", password)
@@ -26,12 +30,16 @@ def sign_in():
 
 
 def get_tasks_count():
+    global driver
+
     count = driver.find_element_by_xpath("/html/body/header/div/div/nav/div/div/span").text
     parts = count.split('/')
     return int(parts[1])
 
 
 def solve_task():
+    global driver
+
     try:
         driver.find_element_by_xpath("/html/body/main/div[1]/article/div[2]/div/button").click()
         show_answer = driver.find_element_by_css_selector(
@@ -49,15 +57,19 @@ def solve_task():
 
 
 def run_solve(count, trainer_url):
-    for i in range(1, count):
+    global driver
+
+    for i in range(1, count + 1):
         current_position = i
-        now_url = trainer_url + "/" + str(current_position)
+        now_url = f"{trainer_url}/{current_position}"
         print(now_url)
         driver.get(now_url)
         solve_task()
 
 
 def get_trainer_links():
+    global driver
+
     print('Собираю ссылки на все тренажёры...')
     driver.get('https://htmlacademy.ru/courses')
 
@@ -66,29 +78,33 @@ def get_trainer_links():
     courses_links = []
 
     for link in all_links:
-        courses_links.append(str(link.get_attribute('href')))
+        courses_links.append(link.get_attribute('href'))
 
     courses_links = list(set(courses_links))
 
     for course_href in courses_links:
-        if course_href.find('courses/') != -1:
-            driver.get(course_href)
-            course_page_links = driver.find_elements_by_tag_name('a')
+        if course_href.find('courses/') == -1:
+            continue
 
-            for page_link in course_page_links:
-                href_page_link = str(page_link.get_attribute('href'))
-                if href_page_link.find('continue/course/') != -1:
-                    trainers_links.append(href_page_link)
+        driver.get(course_href)
+        course_page_links = driver.find_elements_by_tag_name('a')
+
+        for page_link in course_page_links:
+            href_page_link = page_link.get_attribute('href')
+            if href_page_link.find('continue/course/') != -1:
+                trainers_links.append(href_page_link)
 
     print('Будто бы всё собрал...')
     return list(set(trainers_links))
 
 
 def solve():
+    global driver
+
     sign_in()
     print('Давай короче я погнал')
 
-    trainer_link = 'https://htmlacademy.ru/continue/course/'
+    trainer_link = 'https://htmlacademy.ru/continue/course'
 
     links_id = [
         39, 42, 44, 45, 46, 50, 51, 53, 55, 57, 58, 65, 66, 70, 71, 73, 74, 76, 79, 80, 84, 85, 86, 88, 96, 97, 98,
