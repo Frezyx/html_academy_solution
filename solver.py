@@ -1,4 +1,6 @@
 from getpass import getpass
+from multiprocessing import cpu_count
+from multiprocessing.pool import Pool
 from os import environ
 
 import selenium.webdriver.support.expected_conditions as EC
@@ -6,13 +8,14 @@ from selenium import webdriver
 # from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from seleniumwire.webdriver import ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-
+from selenium.webdriver.support.wait import WebDriverWait
+import selenium.webdriver.chrome.options as ChromeOptions
 
 # global
 unsolved_tasks_urls = []
+login = None
+password = None
 
 
 def init_driver():
@@ -81,14 +84,14 @@ def solve_task(driver, task_url):
 def solve_tasks(driver, count, trainer_url):
     for i in range(1, count + 1):
         task_url = f"{trainer_url}/{i}"
-        print(task_url)
+
         try:
             solve_task(driver, task_url)
         except TimeoutException:
-            print("Время ожидания элемента вышло")
+            print(f"Время ожидания элемента вышло ({task_url})")
             unsolved_tasks_urls.append(task_url)
         except Exception as e:
-            print(f"Произошла ошибка при решении: {e}")
+            print(f"Произошла ошибка при решении ({task_url}): {e}")
             unsolved_tasks_urls.append(task_url)
 
 
@@ -123,7 +126,7 @@ def solve(driver, links_id):
     for link_id in links_id:
         trainer_url = f'{trainer_template}/{link_id}'
         try:
-            count_tasks = get_tasks_count(driver,trainer_url)
+            count_tasks = get_tasks_count(driver, trainer_url)
         except Exception:
             print(f"Невозможно найти кол-во заданий ({trainer_url})")
             continue
@@ -134,7 +137,16 @@ def solve(driver, links_id):
         solve_tasks(driver, count_tasks, trainer_url)
 
 
+def process_task(links_id):
+    with init_driver() as driver:
+        print("Логинюсь")
+        sign_in(driver, login, password)
+
+        solve(driver, links_id)
+
+
 def main():
+    global login, password
     login = environ.get("LOGIN", None)
     password = environ.get("PASSWORD", None)
 
@@ -150,11 +162,12 @@ def main():
         359, 365, 367
     ]
 
-    with init_driver() as driver:
-        print("Логинюсь")
-        sign_in(driver, login, password)
+    process_count = cpu_count()
+    chunk_size = len(links_id) // process_count + len(links_id) % process_count
+    chunked_links_id = (links_id[chunk_size * i: chunk_size * (i + 1)] for i in range(process_count))
 
-        solve(driver, links_id)
+    with Pool(process_count) as pool:
+        pool.map(process_task, chunked_links_id)
 
     print("\nНерешённые задания:", *unsolved_tasks_urls, sep='\n')
 
