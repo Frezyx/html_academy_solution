@@ -5,7 +5,7 @@ from os import environ
 
 import selenium.webdriver.support.expected_conditions as EC
 from selenium import webdriver
-# from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -183,8 +183,7 @@ def main():
 
     links = [f'{"https://htmlacademy.ru/continue/course"}/{link_id}' for link_id in links_id]
 
-    # process_count = cpu_count()
-    process_count = 4
+    process_count = cpu_count()
 
     with Pool(process_count) as pool:
         chunked_links = split_tasks(links, process_count)
