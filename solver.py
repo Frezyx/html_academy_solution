@@ -5,12 +5,12 @@ from os import environ
 
 import selenium.webdriver.support.expected_conditions as EC
 from selenium import webdriver
-# from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.support.wait import WebDriverWait
-import selenium.webdriver.chrome.options as ChromeOptions
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 # global
 unsolved_tasks_urls = []
